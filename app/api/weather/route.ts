@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Try to get API key from environment variables
-    const API_KEY = process.env.OPENWEATHER_API_KEY || process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY
+    // Only use server-side environment variable (not NEXT_PUBLIC_)
+    const API_KEY = process.env.OPENWEATHER_API_KEY
     
     if (!API_KEY || API_KEY === "demo_key") {
       // Return mock data if no API key is available
@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
     
     let apiUrl = ""
     if (type === 'current') {
-      apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+      apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${0b86b19545af6e2aa38bad1f590f5a0d}&units=metric`
     } else if (type === 'forecast') {
-      apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+      apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${0b86b19545af6e2aa38bad1f590f5a0d}&units=metric`
     }
 
     const response = await fetch(apiUrl, {

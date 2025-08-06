@@ -116,314 +116,6 @@ export default function PlantDoctor() {
     )
   }
 
-  const analyzeImageForDisease = async (imageFile: File, context: any): Promise<DiagnosisResult> => {
-    try {
-      const formData = new FormData()
-      formData.append("image", imageFile)
-      formData.append("cropType", context.cropType || "")
-      formData.append("cropCategory", context.cropCategory || "")
-      formData.append("symptoms", JSON.stringify(context.symptoms || []))
-      formData.append("additionalInfo", context.additionalInfo || "")
-      formData.append("location", JSON.stringify(context.location || {}))
-
-      const response = await fetch("/api/analyze-plant", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`)
-      }
-
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error("Plant analysis error:", error)
-      
-      // Fallback to intelligent local analysis
-      return generateIntelligentFallback(imageFile, context)
-    }
-  }
-
-  const generateIntelligentFallback = async (imageFile: File, context: any): Promise<DiagnosisResult> => {
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    // Basic image validation
-    const isValidPlant = await validatePlantImage(imageFile)
-    
-    if (!isValidPlant) {
-      return {
-        isValidPlant: false,
-        plantDetected: "No plant detected",
-        disease: "Image Analysis Required",
-        severity: "Low",
-        confidence: 15,
-        symptoms: ["No plant material visible"],
-        causes: ["Non-plant image uploaded"],
-        treatment: ["Please upload a clear image of the affected plant"],
-        prevention: ["Ensure good lighting and focus when taking plant photos"],
-        imageQuality: "Poor",
-        additionalNotes: "The uploaded image does not appear to contain plant material. Please upload a clear photo of leaves, stems, or other plant parts showing the problem area.",
-        urgency: "Low",
-        estimatedRecoveryTime: "N/A",
-        recommendedProducts: []
-      }
-    }
-
-    // Generate context-aware diagnosis
-    const diseases = getContextualDiseases(context.cropType, context.cropCategory, context.symptoms)
-    const selectedDisease = diseases[Math.floor(Math.random() * diseases.length)]
-    
-    const confidence = calculateConfidence(context)
-    const imageQuality = assessImageQuality(imageFile)
-    
-    return {
-      isValidPlant: true,
-      plantDetected: context.cropType || "Plant detected",
-      ...selectedDisease,
-      confidence,
-      imageQuality,
-      additionalNotes: `Analysis based on ${context.cropType || 'plant'} characteristics and reported symptoms. ${location ? `Local conditions in ${location.district}, ${location.state} considered.` : 'Consider setting your location for more accurate recommendations.'}`
-    }
-  }
-
-  const validatePlantImage = async (imageFile: File): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const img = new Image()
-      img.onload = () => {
-        // Basic heuristics for plant detection
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          resolve(true) // Default to true if can't analyze
-          return
-        }
-        
-        canvas.width = 100
-        canvas.height = 100
-        ctx.drawImage(img, 0, 0, 100, 100)
-        
-        const imageData = ctx.getImageData(0, 0, 100, 100)
-        const data = imageData.data
-        
-        let greenPixels = 0
-        let totalPixels = data.length / 4
-        
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i]
-          const g = data[i + 1]
-          const b = data[i + 2]
-          
-          // Check for green-ish colors (plant-like)
-          if (g > r && g > b && g > 50) {
-            greenPixels++
-          }
-        }
-        
-        const greenRatio = greenPixels / totalPixels
-        resolve(greenRatio > 0.1) // At least 10% green-ish pixels
-      }
-      
-      img.onerror = () => resolve(true) // Default to true if can't load
-      img.src = URL.createObjectURL(imageFile)
-    })
-  }
-
-  const getContextualDiseases = (cropType: string, category: string, symptoms: string[]) => {
-    const diseaseDatabase = {
-      tomato: [
-        {
-          disease: "Early Blight",
-          severity: "Medium" as const,
-          symptoms: ["Brown spots with concentric rings", "Yellowing leaves", "Leaf drop"],
-          causes: ["Alternaria solani fungus", "High humidity", "Poor air circulation"],
-          treatment: ["Apply copper-based fungicide", "Remove affected leaves", "Improve drainage"],
-          prevention: ["Crop rotation", "Proper spacing", "Avoid overhead watering"],
-          urgency: "Medium" as const,
-          estimatedRecoveryTime: "2-3 weeks with treatment",
-          recommendedProducts: [
-            {
-              name: "Copper Oxychloride 50% WP",
-              type: "Fungicide" as const,
-              price: "₹245",
-              rating: 4.5,
-              description: "Effective copper-based fungicide for early blight control",
-              activeIngredient: "Copper Oxychloride 50%",
-              applicationMethod: "Foliar spray - 2g per liter",
-              link: "https://www.amazon.in/dp/B08XYZT123",
-              image: "/placeholder.svg?height=100&width=100&text=Copper+Fungicide",
-              inStock: true
-            },
-            {
-              name: "Neem Oil Organic Spray",
-              type: "Organic" as const,
-              price: "₹180",
-              rating: 4.2,
-              description: "Natural organic solution for fungal diseases",
-              applicationMethod: "Dilute 5ml per liter and spray",
-              link: "https://www.amazon.in/dp/B09NEEM456",
-              image: "/neem-oil-product.png",
-              inStock: true
-            }
-          ]
-        },
-        {
-          disease: "Late Blight",
-          severity: "High" as const,
-          symptoms: ["Water-soaked spots", "White fuzzy growth", "Rapid plant death"],
-          causes: ["Phytophthora infestans", "Cool wet weather", "Poor ventilation"],
-          treatment: ["Apply systemic fungicide immediately", "Remove all affected plants", "Improve air circulation"],
-          prevention: ["Use resistant varieties", "Avoid overhead irrigation", "Monitor weather conditions"],
-          urgency: "Critical" as const,
-          estimatedRecoveryTime: "4-6 weeks if caught early",
-          recommendedProducts: [
-            {
-              name: "Metalaxyl 8% + Mancozeb 64% WP",
-              type: "Fungicide" as const,
-              price: "₹320",
-              rating: 4.7,
-              description: "Systemic fungicide for late blight control",
-              activeIngredient: "Metalaxyl + Mancozeb",
-              applicationMethod: "2.5g per liter water",
-              link: "https://www.amazon.in/dp/B08METAL789",
-              image: "/placeholder.svg?height=100&width=100&text=Metalaxyl",
-              inStock: true
-            }
-          ]
-        }
-      ],
-      rice: [
-        {
-          disease: "Blast Disease",
-          severity: "High" as const,
-          symptoms: ["Diamond-shaped lesions", "Gray centers with brown borders", "Panicle blast"],
-          causes: ["Magnaporthe oryzae fungus", "High nitrogen", "Dense planting"],
-          treatment: ["Apply tricyclazole fungicide", "Reduce nitrogen fertilizer", "Improve field drainage"],
-          prevention: ["Use resistant varieties", "Balanced fertilization", "Proper water management"],
-          urgency: "High" as const,
-          estimatedRecoveryTime: "3-4 weeks with proper treatment",
-          recommendedProducts: [
-            {
-              name: "Tricyclazole 75% WP",
-              type: "Fungicide" as const,
-              price: "₹280",
-              rating: 4.6,
-              description: "Specialized fungicide for rice blast disease",
-              activeIngredient: "Tricyclazole 75%",
-              applicationMethod: "0.6g per liter water",
-              link: "https://www.amazon.in/dp/B08TRICY123",
-              image: "/placeholder.svg?height=100&width=100&text=Tricyclazole",
-              inStock: true
-            }
-          ]
-        }
-      ],
-      wheat: [
-        {
-          disease: "Rust Disease",
-          severity: "Medium" as const,
-          symptoms: ["Orange-red pustules", "Yellowing leaves", "Reduced grain quality"],
-          causes: ["Puccinia species", "Moderate temperatures", "High humidity"],
-          treatment: ["Apply propiconazole fungicide", "Remove infected debris", "Monitor regularly"],
-          prevention: ["Use resistant varieties", "Proper crop rotation", "Timely sowing"],
-          urgency: "Medium" as const,
-          estimatedRecoveryTime: "2-3 weeks",
-          recommendedProducts: [
-            {
-              name: "Propiconazole 25% EC",
-              type: "Fungicide" as const,
-              price: "₹195",
-              rating: 4.4,
-              description: "Effective systemic fungicide for rust diseases",
-              activeIngredient: "Propiconazole 25%",
-              applicationMethod: "1ml per liter water",
-              link: "https://www.amazon.in/dp/B08PROPI456",
-              image: "/placeholder.svg?height=100&width=100&text=Propiconazole",
-              inStock: true
-            }
-          ]
-        }
-      ]
-    }
-
-    const cropDiseases = diseaseDatabase[cropType?.toLowerCase() as keyof typeof diseaseDatabase]
-    if (cropDiseases) return cropDiseases
-
-    // Generic diseases based on symptoms
-    if (symptoms.includes("Brown spots on leaves")) {
-      return [{
-        disease: "Leaf Spot Disease",
-        severity: "Medium" as const,
-        symptoms: ["Brown circular spots", "Yellowing around spots", "Leaf drop"],
-        causes: ["Fungal infection", "High humidity", "Poor air circulation"],
-        treatment: ["Apply broad-spectrum fungicide", "Remove affected leaves", "Improve ventilation"],
-        prevention: ["Avoid overhead watering", "Proper plant spacing", "Regular monitoring"],
-        urgency: "Medium" as const,
-        estimatedRecoveryTime: "2-3 weeks",
-        recommendedProducts: [
-          {
-            name: "Mancozeb 75% WP",
-            type: "Fungicide" as const,
-            price: "₹165",
-            rating: 4.3,
-            description: "Broad-spectrum fungicide for leaf spot diseases",
-            activeIngredient: "Mancozeb 75%",
-            applicationMethod: "2g per liter water",
-            link: "https://www.amazon.in/dp/B08MANCO789",
-            image: "/placeholder.svg?height=100&width=100&text=Mancozeb",
-            inStock: true
-          }
-        ]
-      }]
-    }
-
-    // Default generic disease
-    return [{
-      disease: "General Plant Stress",
-      severity: "Low" as const,
-      symptoms: ["Variable symptoms", "Reduced vigor", "Poor growth"],
-      causes: ["Environmental stress", "Nutrient deficiency", "Water stress"],
-      treatment: ["Improve growing conditions", "Check soil nutrition", "Adjust watering"],
-      prevention: ["Regular monitoring", "Proper fertilization", "Adequate watering"],
-      urgency: "Low" as const,
-      estimatedRecoveryTime: "1-2 weeks",
-      recommendedProducts: [
-        {
-          name: "NPK 19:19:19 Water Soluble Fertilizer",
-          type: "Fertilizer" as const,
-          price: "₹120",
-          rating: 4.1,
-          description: "Balanced nutrition for stressed plants",
-          applicationMethod: "5g per liter water",
-          link: "https://www.amazon.in/dp/B08NPK1919",
-          image: "/npk-fertilizer.png",
-          inStock: true
-        }
-      ]
-    }]
-  }
-
-  const calculateConfidence = (context: any): number => {
-    let confidence = 60 // Base confidence
-
-    if (context.cropType) confidence += 15
-    if (context.symptoms && context.symptoms.length > 0) confidence += 10
-    if (context.additionalInfo) confidence += 5
-    if (context.location) confidence += 10
-
-    return Math.min(confidence, 95)
-  }
-
-  const assessImageQuality = (imageFile: File): "Poor" | "Fair" | "Good" | "Excellent" => {
-    const sizeInMB = imageFile.size / (1024 * 1024)
-    
-    if (sizeInMB > 5) return "Excellent"
-    if (sizeInMB > 2) return "Good"
-    if (sizeInMB > 0.5) return "Fair"
-    return "Poor"
-  }
-
   const analyzePlant = async () => {
     if (!selectedImage) {
       toast({
@@ -438,15 +130,24 @@ export default function PlantDoctor() {
     setDiagnosis(null)
 
     try {
-      const context = {
-        cropType,
-        cropCategory,
-        symptoms,
-        additionalInfo,
-        location,
+      const formData = new FormData()
+      formData.append("image", selectedImage)
+      formData.append("cropType", cropType || "")
+      formData.append("cropCategory", cropCategory || "")
+      formData.append("symptoms", JSON.stringify(symptoms || []))
+      formData.append("additionalInfo", additionalInfo || "")
+      formData.append("location", JSON.stringify(location || {}))
+
+      const response = await fetch("/api/analyze-plant", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`)
       }
 
-      const result = await analyzeImageForDisease(selectedImage, context)
+      const result = await response.json()
       setDiagnosis(result)
 
       if (result.isValidPlant) {
@@ -462,6 +163,7 @@ export default function PlantDoctor() {
         })
       }
     } catch (error) {
+      console.error("Analysis error:", error)
       toast({
         title: "Analysis Failed",
         description: "Unable to analyze the image. Please try again.",

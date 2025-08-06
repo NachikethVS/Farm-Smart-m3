@@ -1,98 +1,30 @@
-🌱 FarmSmart – Smart Farming Assistant for Indian Farmers
-Welcome to FarmSmart, your personalized AI-powered agricultural assistant, tailored to local farming needs in Davangere, Karnataka and beyond. Get real-time data, smart recommendations, and tools designed to empower modern farmers with the latest technology.
+# Farming app requirements
 
-🚜 Key Features
-📍 Personalized Dashboard
-Displays real-time weather for Davangere
+*Automatically synced with your [v0.dev](https://v0.dev) deployments*
 
-Custom farming tips based on local crop patterns and climate
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/amithp2005-2964s-projects/v0-farming-app-requirements)
+[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/pxhYTJUAAFG)
 
-Daily/weekly task tracking and alerts
+## Overview
 
-🧠 AI Modules
-✅ Crop Planner
-AI-generated weekly farming tasks based on:
+This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
+Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
 
-Crop type
+## Deployment
 
-Seasonal cycles
-
-Local climate data
-
-🩺 Plant Doctor
-Upload plant images
-
-Detect diseases, nutrient deficiencies, or pests using AI
-
-Get treatment recommendations instantly
-
-🌦 Weather Scheduler
-Sync tasks (planting, fertilizing, irrigation) with real-time weather forecasts
-
-Prevent crop damage from unexpected weather
-
-💧 Irrigation Planner
-Smart irrigation recommendations
-
-Optimize water usage with crop, soil, and weather data
-
-🌿 Fertilizer Calculator
-Calculate optimal fertilizer doses
-
-Based on soil type, crop stage, and yield goals
-
-🛍 Commerce & Market
-🏪 Agri Store
-Buy verified seeds, pesticides, tools, and fertilizers
-
-From trusted vendors
-
-📈 Market Prices
-Get real-time crop prices from local and national markets
-
-Plan your sales for maximum profit
-
-📊 Market Insights
-Analyze trends and discover selling opportunities
-
-Smart alerts on best times and regions to sell
-
-🧑‍🌾 Community & Support
-🗣 Community
-Ask questions, share tips, or post photos
-
-Interact with other farmers, agronomists, and experts
-
-💰 Schemes & Subsidies
-Discover government schemes (PM-KISAN, fertilizer subsidies, crop insurance, etc.)
-
-Apply directly through the platform
-
-📡 Live Weather Data (Davangere Example)
-Temperature: 31°C
-
-Humidity: 69%
-
-Condition: Partly Cloudy
-
-Rainfall: 19mm
-
-🔍 Command Palette (⌘K)
-Quick access to:
-
-Tools
-
-Crops
-
-Diseases
-
-Modules
-
-Weather & Market data
-
-🚀 Deployment
 Your project is live at:
-🔗 FarmSmart on Vercel
 
-Built with farmers, for farmers.
-Empowering agriculture with AI.
+**[https://vercel.com/amithp2005-2964s-projects/v0-farming-app-requirements](https://vercel.com/amithp2005-2964s-projects/v0-farming-app-requirements)**
+
+## Build your app
+
+Continue building your app on:
+
+**[https://v0.dev/chat/projects/pxhYTJUAAFG](https://v0.dev/chat/projects/pxhYTJUAAFG)**
+
+## How It Works
+
+1. Create and modify your project using [v0.dev](https://v0.dev)
+2. Deploy your chats from the v0 interface
+3. Changes are automatically pushed to this repository
+4. Vercel deploys the latest version from this repository
